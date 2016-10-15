@@ -1,0 +1,1 @@
+{"s1time":"06:00","s2time":"18:00","offset":-18000,"host":"EspFeeder","ssid":"YOURSSID","password":"YOURPASSWORD","timeserver":"0.pool.ntp.org","s1min":10,"s1max":90,"s2min":10,"s2max":90,"resettime":"00:00","gettime":"02:01"}
