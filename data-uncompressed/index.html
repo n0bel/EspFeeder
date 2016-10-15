@@ -15,8 +15,8 @@
 		function getStatus() {
       if (intervalHandle) window.clearInterval(intervalHandle);
       $.getJSON('status', function (data) {
-        $( '#s1' ).text(data.s1);
-  			$( '#s2' ).text(data.s2);
+        $( '#s1' ).text(data.servo1);
+  			$( '#s2' ).text(data.servo2);
         statusTime = data.time;
         $( '#stime' ).text(new Date(statusTime*1000).toString());
         intervalHandle = window.setInterval(function(){
@@ -62,7 +62,7 @@
     </div>
     <div class="row">
       <div class="large-3 columns">
-        <a href="config.htm" class='button tiny'>Go to Config</a>
+        <a href="config.html" class='button tiny'>Go to Config</a>
       </div>
       <div class="large-3 columns">
         <button id='refresh' class='tiny'>Refresh</button>

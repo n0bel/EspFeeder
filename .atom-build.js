@@ -67,7 +67,7 @@ module.exports = {
     },
     terminal:
     {
-      cmd: 'start ' + path_to_terminal + ' && exit'
+      cmd: path_to_terminal
     },
     clean: {
       cmd: 'del {PROJECT_PATH}\\build /s/q && rmdir {PROJECT_PATH}\\build /s/q'

@@ -1,11 +1,12 @@
 /*
  EspFeeder -- Web Server Enabled Pet Feeder
- Base code is FSWEbServer example, as shown below.
+ Base code is https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WebServer/examples/FSBrowser/FSBrowser.ino
+ Base Code Copyright (c) 2015 Hristo Gochkov. All rights reserved. LGPL
  Code is highly modifed.
 */
 
 
-/*
+/* Started with this:
   FSWebServer - Example WebServer with SPIFFS backend for esp8266
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
   This file is part of the ESP8266WebServer library for Arduino environment.
@@ -26,8 +27,6 @@
   or you can upload the contents of a folder if you CD in that folder and run the following command:
   for file in `ls -A1`; do curl -F "file=@$PWD/$file" esp8266fs.local/edit; done
 
-  access the sample web page at http://esp8266fs.local
-  edit the page by going to http://esp8266fs.local/edit
 */
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
@@ -47,59 +46,62 @@
 #define SERVO2 12
 #define TONE 4
 
-
 Servo servo1;
 Servo servo2;
 
-Bounce b1 = Bounce();
-Bounce b2 = Bounce();
+Bounce button1 = Bounce();
+Bounce button2 = Bounce();
 
 
 #define DBG_OUTPUT_PORT Serial
 
-const char* configFile = "/config.json";
+const char* configFile = "/config.json";   // The config file name
 
-char ssid[31] = { "SSID" };
-char password[31] = { "PASSWORD" };
-char host[31] = { "EspFeeder2" };
+// Note that these are the default values if no /config.json exists, or items are missing from it.
 
-int offset = -18000;
-int s1state = true;
-int s1min = 10;
-int s1max = 90;
-int s2state = true;
-int s2min = 10;
-int s2max = 90;
-char s1time[10];
-int s1hour = 6;
-int s1minute = 0;
-char s2time[10];
-int s2hour = 18;
-int s2minute = 0;
+char ssid[31] = { "SSID" };               // This is the access point to connect to
+char password[31] = { "PASSWORD" };       // And its password
+char host[31] = { "EspFeeder" };          // The host name for .local (mdns) hostname
 
-int apMode = false;
+int offsetGMT = -18000;       // Local timezone offset in seconds
+int servo1State = true;       // current servo state (true = latched)
+int servo1Latched = 10;       // The servo value to set when latched
+int servo1Unlatched = 90;     // The servo value to set when unlatched
+int servo2State = true;       // current servo state (true = latched)
+int servo2Latched = 10;       // The servo value to set when latched
+int servo2Unlatched = 90;     // The servo value to set when unlatched
+char servo1Time[10];          // Time string (HH:MM 24hr time) when to unlatch (feed the pet)
+int servo1hour = 6;           // The time string hour is parsed to this variable
+int servo1Minute = 0;         // The time string minute is parsed to this variable
+char servo2Time[10];          // Time string (HH:MM 24hr time) when to unlatch (feed the pet)
+int servo2hour = 18;          // The time string hour is parsed to this variable
+int servo2Minute = 0;         // The time string minute is parsed to this variable
 
-ESP8266WebServer server(80);
-//holds the current upload
-File fsUploadFile;
+int apMode = false;           // Are we in Acess Point mode?
+
+char timeServer[31] = { "0.pool.ntp.org" };   // the NTP timeServer to use
+char getTime[10] = { "02:01" };               // what time to resync with the NTP server
+int getHour = 2;                              // parsed hour of above
+int getMinute = 1;                            // parsed minute of above
+char resetTime[10] = { "00:00" };             // what time to auto reset (note the servos may unlatch) 00:00=no reset
+int resetHour = 0;                            // parsed hour of above
+int resetMinute = 0;                          // parsed minute of above
+
+
+ESP8266WebServer server(80);  // The Web Server
+File fsUploadFile;            //holds the current upload when files are uploaded (see edit.htm)
+
+WiFiUDP udp;
 
 IPAddress timeServerIP;
-char timeServer[31] = { "0.pool.ntp.org" };
-char gettime[10] = { "02:01" };
-int gethour = 2;
-int getminute = 1;
-char resettime[10] = { "00:00" };
-int resethour = 0;
-int resetminute = 0;
 unsigned int localPort = 2390; // local port to listen for UDP packets
 const int NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
 byte packetBuffer[ NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets
 // A UDP instance to let us send and receive packets over UDP
-WiFiUDP udp;
 
-time_t timeNow = 0;
-time_t ms = 0;
-int lastminute = -1;
+time_t timeNow = 0;       // current time is stored here
+time_t ms = 0;            // tracking milliseconds
+int lastMinute = -1;      // tracking if minute changed
 int gettingNtp = false;
 int flagRestart = false;
 
@@ -122,6 +124,7 @@ String getContentType(String filename){
   else if(filename.endsWith(".html")) return "text/html";
   else if(filename.endsWith(".css")) return "text/css";
   else if(filename.endsWith(".js")) return "application/javascript";
+  else if(filename.endsWith(".json")) return "text/json";
   else if(filename.endsWith(".png")) return "image/png";
   else if(filename.endsWith(".gif")) return "image/gif";
   else if(filename.endsWith(".jpg")) return "image/jpeg";
@@ -136,7 +139,7 @@ String getContentType(String filename){
 bool handleFileRead(String path){
   DBG_OUTPUT_PORT.print(timeNow);
   DBG_OUTPUT_PORT.println(" handleFileRead: " + path);
-  if(path.endsWith("/")) path += apMode?"setup.htm":"index.htm";
+  if(path.endsWith("/")) path += apMode?"setup.html":"index.html";
 
   String contentType = getContentType(path);
   String pathWithGz = path + ".gz";
@@ -252,31 +255,31 @@ void loadConfig()
       if (root.containsKey("ssid")) strncpy(ssid,root["ssid"],30);
       if (root.containsKey("password")) strncpy(password,root["password"],30);
       if (root.containsKey("host")) strncpy(host,root["host"],30);
-      if (root.containsKey("timeserver")) strncpy(timeServer,root["timeserver"],30);
-      if (root.containsKey("s1min")) s1min = root["s1min"];
-      if (root.containsKey("s1max")) s1max = root["s1max"];
-      if (root.containsKey("s2min")) s2min = root["s2min"];
-      if (root.containsKey("s2max")) s2max = root["s2max"];
-      if (root.containsKey("s1time")) strncpy(s1time,root["s1time"],10);
-      if (root.containsKey("s2time")) strncpy(s2time,root["s2time"],10);
-      if (root.containsKey("gettime")) strncpy(gettime,root["gettime"],10);
-      if (root.containsKey("resettime")) strncpy(resettime,root["resettime"],10);
+      if (root.containsKey("timeServer")) strncpy(timeServer,root["timeServer"],30);
+      if (root.containsKey("servo1Latched")) servo1Latched = root["servo1Latched"];
+      if (root.containsKey("servo1Unlatched")) servo1Unlatched = root["servo1Unlatched"];
+      if (root.containsKey("servo2Latched")) servo2Latched = root["servo2Latched"];
+      if (root.containsKey("servo2Unlatched")) servo2Unlatched = root["servo2Unlatched"];
+      if (root.containsKey("servo1Time")) strncpy(servo1Time,root["servo1Time"],10);
+      if (root.containsKey("servo2Time")) strncpy(servo2Time,root["servo2Time"],10);
+      if (root.containsKey("getTime")) strncpy(getTime,root["getTime"],10);
+      if (root.containsKey("resetTime")) strncpy(resetTime,root["resetTime"],10);
 
-      s1hour = atoi(s1time);
-      if (strchr(s1time,':')) s1minute = atoi(strchr(s1time,':')+1);
-      s2hour = atoi(s2time);
-      if (strchr(s2time,':')) s2minute = atoi(strchr(s2time,':')+1);
+      servo1hour = atoi(servo1Time);
+      if (strchr(servo1Time,':')) servo1Minute = atoi(strchr(servo1Time,':')+1);
+      servo2hour = atoi(servo2Time);
+      if (strchr(servo2Time,':')) servo2Minute = atoi(strchr(servo2Time,':')+1);
 
-      gethour = atoi(gettime);
-      if (strchr(gettime,':')) getminute = atoi(strchr(gettime,':')+1);
-      resethour = atoi(resettime);
-      if (strchr(resettime,':')) resetminute = atoi(strchr(resettime,':')+1);
+      getHour = atoi(getTime);
+      if (strchr(getTime,':')) getMinute = atoi(strchr(getTime,':')+1);
+      resetHour = atoi(resetTime);
+      if (strchr(resetTime,':')) resetMinute = atoi(strchr(resetTime,':')+1);
 
-      DBG_OUTPUT_PORT.printf("Config: host: %s ssid: %s timeserver: %s\n",host,ssid,timeServer);
-      DBG_OUTPUT_PORT.printf("s1time: %s %d %d s2time:%s %d %d s1:%d %d s2:%d %d\n",
-        s1time, s1hour, s1minute, s2time, s2hour, s2minute, s1min, s1max, s2min, s2max);
-      DBG_OUTPUT_PORT.printf("gettime: %s %d %d resettime:%s %d %d\n",
-        gettime, gethour, getminute, resettime, resethour, resetminute);
+      DBG_OUTPUT_PORT.printf("Config: host: %s ssid: %s timeServer: %s\n",host,ssid,timeServer);
+      DBG_OUTPUT_PORT.printf("servo1Time: %s %d %d servo2Time:%s %d %d servo1:%d %d servo2:%d %d\n",
+        servo1Time, servo1hour, servo1Minute, servo2Time, servo2hour, servo2Minute, servo1Latched, servo1Unlatched, servo2Latched, servo2Unlatched);
+      DBG_OUTPUT_PORT.printf("getTime: %s %d %d resetTime:%s %d %d\n",
+        getTime, getHour, getMinute, resetTime, resetHour, resetMinute);
 
     }
   }
@@ -289,11 +292,11 @@ void loadConfig()
 
 void setServos()
 {
-  int s1 = s1state?s1min:s1max;
-  int s2 = s2state?s2min:s2max;
-  servo1.write(s1);
-  servo2.write(s2);
-  DBG_OUTPUT_PORT.printf("set servo1=%d servo2=%d\n",s1,s2);
+  int v1 = servo1State?servo1Latched:servo1Unlatched;
+  int v2 = servo2State?servo2Latched:servo2Unlatched;
+  servo1.write(v1);
+  servo2.write(v2);
+  DBG_OUTPUT_PORT.printf("set servo1=%d servo2=%d\n",v1,v2);
 }
 
 void getNTP()
@@ -324,7 +327,7 @@ void getNTP()
       DBG_OUTPUT_PORT.println(timeServer);
 
       WiFi.hostByName(timeServer, timeServerIP);
-      DBG_OUTPUT_PORT.print("Timeserver IP:");
+      DBG_OUTPUT_PORT.print("timeServer IP:");
       DBG_OUTPUT_PORT.println(timeServerIP);
 
       if (timeServerIP == INADDR_NONE)
@@ -472,7 +475,7 @@ void setup(void){
     delay(500);
     WiFi.softAPmacAddress(mac);
     delay(500);
-    sprintf(ssid,"EspFeeder_%02x%02x%02x",mac[3],mac[4],mac[5]);
+    sprintf(ssid,"EspFeeder_%02x%02x%02x",mac[3],mac[4],mac[5]);   // making a nice unique SSID
     DBG_OUTPUT_PORT.print("SoftAP ssid:");
     DBG_OUTPUT_PORT.println(ssid);
     WiFi.softAP(ssid);
@@ -513,7 +516,7 @@ void setup(void){
   DBG_OUTPUT_PORT.println("/");
 
   // NTP init
-  if (!apMode)
+  if (!apMode)    // if we're in AP Mode we have no internet, so no NTP
   {
     DBG_OUTPUT_PORT.println("Starting UDP for NTP");
     udp.begin(localPort);
@@ -527,13 +530,13 @@ void setup(void){
   }
   servo1.attach(SERVO1);
   pinMode(BUTTON1,INPUT_PULLUP);
-  b1.attach(BUTTON1);
-  b1.interval(100);
+  button1.attach(BUTTON1);
+  button1.interval(100);
 
   servo2.attach(SERVO2);
   pinMode(BUTTON2,INPUT_PULLUP);
-  b2.attach(BUTTON2);
-  b2.interval(100);
+  button2.attach(BUTTON2);
+  button2.interval(100);
 
   setServos();
 
@@ -544,7 +547,7 @@ void setup(void){
   server.on("/list", HTTP_GET, handleFileList);
   //load editor
   server.on("/edit", HTTP_GET, [](){
-    if(!handleFileRead("/edit.htm")) server.send(404, "text/plain", "FileNotFound");
+    if(!handleFileRead("/edit.html")) server.send(404, "text/plain", "FileNotFound");
   });
   //create file
   server.on("/edit", HTTP_PUT, handleFileCreate);
@@ -563,8 +566,8 @@ void setup(void){
 
   server.on("/status", HTTP_GET, [](){
     String json = "{";
-    json += String(  "\"s1\":\"")+String(s1state?"latched":"unlatched")+String("\"");
-    json += String(", \"s2\":\"")+String(s2state?"latched":"unlatched")+String("\"");
+    json += String(  "\"servo1\":\"")+String(servo1State?"latched":"unlatched")+String("\"");
+    json += String(", \"servo2\":\"")+String(servo2State?"latched":"unlatched")+String("\"");
     json += String(", \"time\":")+String(timeNow);
     json += "}";
     server.send(200, "text/json", json);
@@ -574,15 +577,15 @@ void setup(void){
   });
 
   server.on("/toggle1", HTTP_GET, [](){
-    s1state = ! s1state;
+    servo1State = ! servo1State;
     server.send(200, "text/text", "OK");
-    DBG_OUTPUT_PORT.printf("toggle s1 = %d\n",s1state);
+    DBG_OUTPUT_PORT.printf("toggle servo1 = %d\n",servo1State);
     setServos();
   });
   server.on("/toggle2", HTTP_GET, [](){
-    s2state = ! s2state;
+    servo2State = ! servo2State;
     server.send(200, "text/text", "OK");
-    DBG_OUTPUT_PORT.printf("toggle s2 = %d\n",s2state);
+    DBG_OUTPUT_PORT.printf("toggle servo2 = %d\n",servo2State);
     setServos();
   });
   server.on("/restart", HTTP_GET, [](){
@@ -602,19 +605,19 @@ void loop(void){
   server.handleClient();
 
 // handle buttons
-  b1.update();
-  b2.update();
+  button1.update();
+  button2.update();
 
-  if (b1.fell())
+  if (button1.fell())
   {
-    s1state = !s1state;
+    servo1State = !servo1State;
     setServos();
   }
 
 
-  if (b2.fell())
+  if (button2.fell())
   {
-    s2state = !s2state;
+    servo2State = !servo2State;
     setServos();
   }
 
@@ -625,39 +628,39 @@ void loop(void){
     if ( (ms % 1000) == 0)
     {
       timeNow++;
-      time_t t = timeNow + offset;
+      time_t t = timeNow + offsetGMT;
       int hour = (t % 86400) / 3600;
       int minute = (t % 3600) / 60;
-      if (lastminute != minute)
+      if (lastMinute != minute)  // time to check for things to do?
       {
         DBG_OUTPUT_PORT.printf("%d:%02d\n",hour,minute);
-        lastminute = minute;
-        if (flagRestart)
+        lastMinute = minute;
+        if (flagRestart)        // if we flagged a reset
         {
           flagRestart = false;
           ESP.restart();
         }
-        if (s1state)
+        if (servo1State)        // is the servo latched
         {
-          if (s1hour == hour && s1minute == minute)
+          if (servo1hour == hour && servo1Minute == minute) // time to unlatch?
           {
-            s1state = false;
+            servo1State = false;
             setServos();
           }
         }
-        if (s2state)
+        if (servo2State)        // is the servo latched
         {
-          if (s2hour == hour && s2minute == minute)
+          if (servo2hour == hour && servo2Minute == minute) // time to unlatch?
           {
-            s2state = false;
+            servo2State = false;
             setServos();
           }
         }
-        if (gethour == hour && getminute == minute)
+        if (getHour == hour && getMinute == minute)   // time to resync the time?
         {
           if (!gettingNtp && !apMode) getNTP();
         }
-        if (resethour == hour && resetminute == minute && resethour != 0 && resetminute != 0)
+        if (resetHour == hour && resetMinute == minute && resetHour != 0 && resetMinute != 0) // time to reset?
         {
           flagRestart = true;
         }

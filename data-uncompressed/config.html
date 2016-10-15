@@ -60,7 +60,7 @@
         });
 
         editor.on('ready',function() {
-          $( "input[name='root[offset]']" ).after("<button id='settz'; class='tiny'>Set Timezone from Browser</button>");
+          $( "input[name='root[offsetGMT]']" ).after("<button id='settz'; class='tiny'>Set Timezone from Browser</button>");
           $( '#settz' ).click(function(){
             var offset = new Date().getTimezoneOffset() * -60;
             var d = editor.getValue();
@@ -89,7 +89,7 @@
         <a href="/" class='button tiny'>Go to Main Page</a>
       </div>
       <div class="small-2 columns">
-        <a href="/edit.htm" class='button tiny'>Go to FS Editor</a>
+        <a href="/edit.html" class='button tiny'>Go to FS Editor</a>
       </div>
     </div>
     <div class='row'>

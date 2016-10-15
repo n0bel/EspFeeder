@@ -3,7 +3,7 @@
 	"type": "object",
 	"properties":
 	{
-		"s1time":
+		"servo1Time":
 		{
 			"title": "Time to activate Feeder 1 servo",
 			"type": "string",
@@ -11,7 +11,7 @@
 			"default": "06:00",
 			"propertyOrder": 10
 		},
-		"s2time":
+		"servo2Time":
 		{
 			"title": "Time to activate Feeder 2 servo",
 			"type": "string",
@@ -19,7 +19,7 @@
 			"default": "18:00",
 			"propertyOrder": 20
 		},
-		"offset":
+		"offsetGMT":
 		{
 			"title": "Timezone Offset (seconds)",
 			"type": "integer",
@@ -45,14 +45,14 @@
 			"format": "password",
 			"propertyOrder": 60
 		},
-		"timeserver":
+		"timeServer":
 		{
 			"title": "Timeserver",
 			"type": "string",
 			"default": "0.pool.ntp.org",
 			"propertyOrder": 70
 		},
-		"s1min":
+		"servo1Latched":
 		{
 			"title": "Feeder Servo 1 Latched value",
 			"type": "integer",
@@ -61,7 +61,7 @@
 			"maximum": 180,
 			"propertyOrder": 80
 		},
-		"s1max":
+		"servo1Unlatched":
 		{
 			"title": "Feeder Servo 1 Unlatched value",
 			"type": "integer",
@@ -70,7 +70,7 @@
 			"maximum": 180,
 			"propertyOrder": 90
 		},
-		"s2min":
+		"servo2Latched":
 		{
 			"title": "Feeder Servo 2 Latched value",
 			"type": "integer",
@@ -79,7 +79,7 @@
 			"maximum": 180,
 			"propertyOrder": 100
 		},
-		"s2max":
+		"servo2Unlatched":
 		{
 			"title": "Feeder Servo 2 Unlatched value",
 			"type": "integer",
@@ -88,16 +88,16 @@
 			"maximum": 180,
 			"propertyOrder": 110
 		},
-		"resettime":
+		"resetTime":
 		{
 			"title": "Reset the feeder at this time.",
-			"description": "00:00 to disable. NOTE: Both Servos will unlatch during reset.",
+			"description": "00:00 to disable. NOTE: Both Servos may unlatch during reset.",
 			"type": "string",
 			"format": "time",
 			"default": "00:00",
 			"propertyOrder": 120
 		},
-		"gettime":
+		"getTime":
 		{
 			"title": "Resync to the time server at this time.",
 			"description": "00:00 to disable.",
