@@ -5,7 +5,7 @@ This project uses ESP8266WebServer and SPIFFS to create a web enabled automated 
 
 ![PiClock Picture](https://raw.githubusercontent.com/n0bel/EspFeeder/master/Gallery/EspFeederStatusPage_Fotor_Collage.jpg)
 
-Two servos control the lids of two feeding trays.  Two buttons correspondingly control each servo.  Once configured
+Two servos control the lids of two feeding trays.  Two buttons correspondingly control each servo.  Once configured you can set the time when each servo is activated.
 
 ## Requirements
 
@@ -48,6 +48,8 @@ Then compile and upload the .ino.
 
 ### Quick Test
 You should be able to push the buttons and the servos will move.  Check out the video:
+[![EspFeeder Quick Test](https://raw.githubusercontent.com/n0bel/EspFeeder/master/Gallery/2016-10-15_20-26-49.jpg)](https://www.youtube.com/watch?v=8MBRnC_cMpc "EspFeeder Quick Test")
+
 
 ### Setup
 
@@ -80,7 +82,7 @@ http://stackoverflow.com/questions/23624525/standard-mdns-service-on-windows
 * ping from a computer that does handle mDNS   --  ping espfeeder.local
 
 Hopefully you'll then see this:
-![PiClock Picture](https://github.com/n0bel/EspFeeder/blob/master/Gallery/EspFeederStatusPage.jpg?raw=true)
+![Status Page](https://github.com/n0bel/EspFeeder/blob/master/Gallery/EspFeederStatusPage.jpg?raw=true)
 
 And if you click Go To Config you'll see this:
-![PiClock Picture](https://github.com/n0bel/EspFeeder/blob/master/Gallery/EspFeederConfigPage.jpg?raw=true)
+![Config Page](https://github.com/n0bel/EspFeeder/blob/master/Gallery/EspFeederConfigPage.jpg?raw=true)
