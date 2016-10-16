@@ -3,7 +3,7 @@
 
 This project uses ESP8266WebServer and SPIFFS to create a web enabled automated pet controller.
 
-![PiClock Picture](https://raw.githubusercontent.com/n0bel/EspFeeder/master/Gallery/EspFeederStatusPage_Fotor_Collage.jpg)
+![EspFeeder Collage](https://raw.githubusercontent.com/n0bel/EspFeeder/master/Gallery/EspFeederStatusPage_Fotor_Collage.jpg)
 
 Two servos control the lids of two feeding trays.  Two buttons correspondingly control each servo.  Once configured you can set the time when each servo is activated.
 
@@ -30,11 +30,12 @@ Two servos control the lids of two feeding trays.  Two buttons correspondingly c
 ### Hardware
 
 Wireup according to the picture.  You can change which pin you use for each function near the top of the
-scetch where it refers to BUTTON1, BUTTON2, SERVO1, SERVO2 and TONE.  I use an ESP-12, so the code
+sketch where it refers to BUTTON1, BUTTON2, SERVO1, SERVO2 and TONE.  I use an ESP-12, so the code
 is showing the pins I chose for ti.
 
-Arrange the servos and the buttons on your pet feeder as shown, or differently if you're using some other
-kind of feeder.
+Arrange the servos and the buttons on your pet feeder as shown on the schematic, or differently if you're using some other kind of feeder.   * The FTDI, USB and Regulator may not be needed depending on which ESP you're using (i.e. nodemcu/hazza, etc)
+
+![EspFeeder Schematic](https://raw.githubusercontent.com/n0bel/EspFeeder/master/Gallery/EspFeeder_schem.jpg)
 
 ### Software
 Don't forget to restart the Arduino IDE after installing the libraries and boards.
@@ -75,8 +76,7 @@ address of the EspFeeder through one of the following methods (or make up your o
 
 * Log into your router and look at the dhcp leases (sometimes called dhcp client list)
 find the entry that shows ESP_xxxxxx
-* Connect a serial ttl dongle to the EspFeeder, set the baud rate to 74880.  During
-startup, you'll see the IP address shown.
+* Connect a serial ttl dongle to the EspFeeder, set the baud rate to 74880.  During startup, you'll see the IP address shown.
 * Get mDNS on your computer: here's some info for windows:
 http://stackoverflow.com/questions/23624525/standard-mdns-service-on-windows
 * ping from a computer that does handle mDNS   --  ping espfeeder.local
@@ -86,3 +86,6 @@ Hopefully you'll then see this:
 
 And if you click Go To Config you'll see this:
 ![Config Page](https://github.com/n0bel/EspFeeder/blob/master/Gallery/EspFeederConfigPage.jpg?raw=true)
+
+### Mess with your cat!
+[![EspFeeder Quick Demo](https://raw.githubusercontent.com/n0bel/EspFeeder/master/Gallery/2016-10-15_21-00-21.jpg)](https://www.youtube.com/watch?v=8HrXfQ1xYFg "EspFeeder Quick Demo")
