@@ -5,29 +5,26 @@
  Code is highly modifed.
 */
 
+/* Requirements:
+  Arduino-1.6.11
+  ESP8266/Arduino :Additional Boards Manager URL: http://arduino.esp8266.com/stable/package_esp8266com_index.json
+  ESP8266FS plugin, installed in tools https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.2.0/ESP8266FS-0.2.0.zip
+  Bounce2 Library, installed in library https://github.com/thomasfredericks/Bounce2/releases/tag/V2.21
+  ArduinoJson Library, install in libarry https://github.com/bblanchon/ArduinoJson/releases/tag/v5.6.7
+      (the libraries can be installed with the library manager instead)
 
-/* Started with this:
-  FSWebServer - Example WebServer with SPIFFS backend for esp8266
-  Copyright (c) 2015 Hristo Gochkov. All rights reserved.
-  This file is part of the ESP8266WebServer library for Arduino environment.
+  Don't forget to restart the Arduino IDE after installing these things.
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-  upload the contents of the data folder with MkSPIFFS Tool ("ESP8266 Sketch Data Upload" in Tools menu in Arduino IDE)
-  or you can upload the contents of a folder if you CD in that folder and run the following command:
-  for file in `ls -A1`; do curl -F "file=@$PWD/$file" esp8266fs.local/edit; done
+  Set your esp settings.. the board, program method, flash size and spiffs size.
 
-*/
+  This uses the SPIFFS file system.  So we need to load that in your esp-xx first.
+  Upload the contents of the data folder with MkSPIFFS Tool ("ESP8266 Sketch Data Upload" in Tools menu in Arduino IDE)
+
+  Then compile and upload the .ino.
+
+  */
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
