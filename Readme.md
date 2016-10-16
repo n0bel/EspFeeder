@@ -14,12 +14,12 @@
 * A Pet Feeder, something like this: https://www.amazon.com/gp/product/B01IPF3N6Y
 
 ### Software
-Arduino-1.6.11
-ESP8266/Arduino :Additional Boards Manager URL: http://arduino.esp8266.com/stable/package_esp8266com_index.json
-ESP8266FS plugin, installed in tools https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.2.0/ESP8266FS-0.2.0.zip
-Bounce2 Library, installed in library https://github.com/thomasfredericks/Bounce2/releases/tag/V2.21
-ArduinoJson Library, install in libarry https://github.com/bblanchon/ArduinoJson/releases/tag/v5.6.7
-    (the libraries can be installed with the library manager instead)
+* Arduino-1.6.11
+* ESP8266/Arduino :Additional Boards Manager URL: http://arduino.esp8266.com/stable/package_esp8266com_index.json
+* ESP8266FS plugin, installed in tools https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.2.0/ESP8266FS-0.2.0.zip
+* Bounce2 Library, installed in library https://github.com/thomasfredericks/Bounce2/releases/tag/V2.21
+* ArduinoJson Library, install in libarry https://github.com/bblanchon/ArduinoJson/releases/tag/v5.6.7
+    * (the libraries can be installed with the library manager instead)
 
 
 ## General Instructions
