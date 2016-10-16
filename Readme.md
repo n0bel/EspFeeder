@@ -46,6 +46,9 @@ Upload the contents of the data folder with MkSPIFFS Tool ("ESP8266 Sketch Data 
 
 Then compile and upload the .ino.
 
+### Quick Test
+You should be able to push the buttons and the servos will move.  Check out the video:
+
 ### Setup
 
 When initially powered on, the internet access point will not be setup.  The EspFeeder will give
@@ -75,3 +78,9 @@ startup, you'll see the IP address shown.
 * Get mDNS on your computer: here's some info for windows:
 http://stackoverflow.com/questions/23624525/standard-mdns-service-on-windows
 * ping from a computer that does handle mDNS   --  ping espfeeder.local
+
+Hopefully you'll then see this:
+![PiClock Picture](https://github.com/n0bel/EspFeeder/blob/master/Gallery/EspFeederStatusPage.jpg?raw=true)
+
+And if you click Go To Config you'll see this:
+![PiClock Picture](https://github.com/n0bel/EspFeeder/blob/master/Gallery/EspFeederConfigPage.jpg?raw=true)
