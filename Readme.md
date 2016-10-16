@@ -11,7 +11,10 @@ Two servos control the lids of two feeding trays.  Two buttons correspondingly c
 
 ### Hardware
 
-* ESP-xx with 4 gpio pins available.  Plus an additional one if you'd like status sounds. (ESP-03, ESP-07, ESP-12x, nodemcu) (probably others)
+* ESP-xx with 4 gpio pins available.  Plus an additional one if you'd like status sounds. (ESP-03, ESP-07, ESP-12x, nodemcu, hazza) (probably others)
+* If using a esp-xx (as opposed to a nodemcu or hazza)
+   * 3.3v regulator
+   * 2 SPST pushe buttons (reset and program)
 * 2 SPST push buttons
 * 2 servos
 * A Pet Feeder, something like this: https://www.amazon.com/gp/product/B01IPF3N6Y
@@ -31,7 +34,7 @@ Two servos control the lids of two feeding trays.  Two buttons correspondingly c
 
 Wireup according to the picture.  You can change which pin you use for each function near the top of the
 sketch where it refers to BUTTON1, BUTTON2, SERVO1, SERVO2 and TONE.  I use an ESP-12, so the code
-is showing the pins I chose for ti.
+is showing the pins I chose for it.
 
 Arrange the servos and the buttons on your pet feeder as shown on the schematic, or differently if you're using some other kind of feeder.   * The FTDI, USB and Regulator may not be needed depending on which ESP you're using (i.e. nodemcu/hazza, etc)
 
