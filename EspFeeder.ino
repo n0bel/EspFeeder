@@ -61,6 +61,7 @@ char password[31] = { "PASSWORD" };       // And its password
 char host[31] = { "EspFeeder" };          // The host name for .local (mdns) hostname
 
 int offsetGMT = -18000;       // Local timezone offset in seconds
+char offsetGMTstring[10] = { "-18000" };
 int servo1State = true;       // current servo state (true = latched)
 int servo1Latched = 10;       // The servo value to set when latched
 int servo1Unlatched = 90;     // The servo value to set when unlatched
@@ -261,6 +262,8 @@ void loadConfig()
       if (root.containsKey("servo2Time")) strncpy(servo2Time,root["servo2Time"],10);
       if (root.containsKey("getTime")) strncpy(getTime,root["getTime"],10);
       if (root.containsKey("resetTime")) strncpy(resetTime,root["resetTime"],10);
+      if (root.containsKey("offsetGMT")) strncpy(offsetGMTstring,root["offsetGMT"],10);
+      offsetGMT = atoi(offsetGMTstring);
 
       servo1hour = atoi(servo1Time);
       if (strchr(servo1Time,':')) servo1Minute = atoi(strchr(servo1Time,':')+1);
@@ -275,8 +278,8 @@ void loadConfig()
       DBG_OUTPUT_PORT.printf("Config: host: %s ssid: %s timeServer: %s\n",host,ssid,timeServer);
       DBG_OUTPUT_PORT.printf("servo1Time: %s %d %d servo2Time:%s %d %d servo1:%d %d servo2:%d %d\n",
         servo1Time, servo1hour, servo1Minute, servo2Time, servo2hour, servo2Minute, servo1Latched, servo1Unlatched, servo2Latched, servo2Unlatched);
-      DBG_OUTPUT_PORT.printf("getTime: %s %d %d resetTime:%s %d %d\n",
-        getTime, getHour, getMinute, resetTime, resetHour, resetMinute);
+      DBG_OUTPUT_PORT.printf("getTime: %s %d %d resetTime:%s %d %d offsetGMT:%d\n",
+        getTime, getHour, getMinute, resetTime, resetHour, resetMinute, offsetGMT);
 
     }
   }

@@ -64,7 +64,7 @@
           $( '#settz' ).click(function(){
             var offset = new Date().getTimezoneOffset() * -60;
             var d = editor.getValue();
-            d.offset = offset;
+            d.offsetGMT = offset;
             editor.setValue(d);
           })
           getConfig();
